@@ -1,28 +1,35 @@
-import { defineComponent, reactive } from 'vue'
-import HelloWorld from './components/HelloWorld'
-// function returnHelloWorld(num: number) {
-//   return <HelloWorld />
-// }
+import { defineComponent, Ref, ref } from 'vue'
+import MonacoEditor from './components/MonacoEditor'
+
+function toJson(data: any) {
+  return JSON.stringify(data, null, 2)
+}
+
+const schema = {
+  type: 'string',
+}
+
 export default defineComponent({
   setup() {
-    const state = reactive({
-      name: 'wangkai',
-    })
-
-    setInterval(() => {
-      state.name += 'h'
-    }, 1000)
-
+    const schemaRef: Ref<any> = ref(schema)
+    const handleCodeChange = (code: string) => {
+      let schema: any
+      try {
+        schema = JSON.parse(code)
+      } catch (error) {}
+      schemaRef.value = schema
+    }
     return () => {
+      const code = toJson(schemaRef.value)
       return (
-        <div id="app">
-          <p>{state.name}</p>
-          <HelloWorld msg="hello" />
+        <div>
+          <MonacoEditor
+            code={code}
+            onChange={handleCodeChange}
+            title="Schema"
+          ></MonacoEditor>
         </div>
       )
     }
-    // return () => {
-    //   return h('div', { id: 'app' }, [h('p', state.name)])
-    // }
   },
 })
